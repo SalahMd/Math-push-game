@@ -6,4 +6,4 @@ class BlockedNumberCell(NumberCell):
         self.type = "blocked_number"
 
     def display(self):
-        return f"[{self.number}]"
+        return f"  [{self.number}] "

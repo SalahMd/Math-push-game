@@ -4,4 +4,4 @@ class EmptyCell(Cell):
         super().__init__(row, col, "empty")
 
     def display(self):
-        return " . "
+        return "  🟩  "

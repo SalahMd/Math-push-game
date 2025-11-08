@@ -5,4 +5,5 @@ class OperationCell(Cell):
         self.operation = operation
 
     def display(self):
-        return f" {self.operation} "
+        ops_map = {"+":"  ➕  ","-":"  ➖  ","*":"  ✖️  ","/":"  ➗  "}
+        return ops_map.get(self.operation, self.operation)

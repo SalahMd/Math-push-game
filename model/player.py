@@ -1,10 +1,9 @@
 from .empty_cell import EmptyCell
 from .cell import Cell
-
 class Player(Cell):
     def __init__(self, row, col):
         super().__init__(row, col, type="player")
-        self.symbol = " P "
+        
 
     def get_pos(self):
         return (self.row, self.col)
@@ -56,8 +55,7 @@ class Player(Cell):
         game.playerPos = (self.row, self.col)
         grid.grid[self.row][self.col] = self  # Replace cell with player
 
-        # After movement, check for equation patterns
         game.check_equations()
 
     def display(self):
-        return self.symbol
+        return "  🤖  "

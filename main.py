@@ -12,19 +12,21 @@ if __name__ == "__main__":
     grid.set_cell(BlockedCell(8, 9))
     grid.set_cell(BlockedCell(8, 8))
     grid.set_cell(BlockedCell(8, 7))
+    for c in range(10):
+        grid.set_cell(BlockedCell(0, c))
 
-    
+    for r in range(10):
+        grid.set_cell(BlockedCell(r, 0))  
 
-    grid.set_cell(NumberCell(2, 1, 2))
-    grid.set_cell(OperationCell(1, 2, '+'))
+    for r in range(8):
+        grid.set_cell(BlockedCell(r, 9))        
+    grid.set_cell(NumberCell(3, 1, 2))
+    grid.set_cell(OperationCell(2, 2, '+'))
     grid.set_cell(OperationCell(4, 2, '+'))
     grid.set_cell(NumberCell(3, 3, 3))
     grid.set_cell(NumberCell(5, 5, 3))
 
-
-
-
-    player=   Player(0, 3)
+    player=   Player(6, 3)
     goalPos = GoalCell(9,9)
     grid.set_cell( player)
     grid.set_cell(goalPos)

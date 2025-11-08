@@ -4,4 +4,4 @@ class GoalCell(Cell):
         super().__init__(row, col, "goal")
 
     def display(self):
-        return " G "
+        return "  🎯  "

@@ -4,7 +4,7 @@ class BlockedCell(Cell):
         super().__init__(row, col, "blocked")
 
     def display(self):
-        return " # "
+        return "  🧱  "
     
     
     def is_walkable(self):
