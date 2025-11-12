@@ -54,8 +54,8 @@ class Player(Cell):
         self.row, self.col = new_row, new_col
         game.playerPos = (self.row, self.col)
         grid.grid[self.row][self.col] = self  # Replace cell with player
+        game.check_if_equal()  # check only after a move
 
-        game.check_equations()
 
     def display(self):
         return "  🤖  "

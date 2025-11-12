@@ -1,4 +1,3 @@
-from .cell import Cell
 from .number_cell import NumberCell
 class BlockedNumberCell(NumberCell):
     def __init__(self, row, col, number: int):

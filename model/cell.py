@@ -7,7 +7,6 @@ class Cell(ABC):
         self.type = type
         self.value = value
 
-    # Polymorphic checks
     def is_empty(self):
         return self.type == "empty"
 
@@ -29,16 +28,8 @@ class Cell(ABC):
     def is_player(self):
         return self.type == "player"
 
-
-    @abstractmethod
-    def display(self) -> str:
-        """Return a string representation of the cell"""
-        pass
-
     def is_walkable(self) -> bool:
-        """Whether the player can move onto this cell"""
         return True
 
     def getPos(self) -> tuple[int, int]:
-        """Return the (row, col) position of this cell."""
         return (self.row, self.col)
