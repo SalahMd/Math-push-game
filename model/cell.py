@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class Cell(ABC):
     def __init__(self, row, col, type="empty", value=None):

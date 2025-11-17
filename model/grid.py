@@ -8,15 +8,16 @@ from .blocked_cell import BlockedCell
 from .empty_cell import EmptyCell
 
 class Grid:
-    def __init__(self, cells,rows,cols):
+    def __init__(self, cells,rows,cols,game):
         self.rows = rows
         self.cols = cols
+        self.game = game
         self.grid = []
         for r, row in enumerate(cells):
             row_list = []
             for c, cell_info in enumerate(row):
-                cell_type = cell_info.get("type", "empty")
-                value = cell_info.get("value", None)
+                cell_type = cell_info["type"]  
+                value = cell_info.get("value", None) 
                 if cell_type == "number":
                     cell = NumberCell(r, c, value)
                 elif cell_type == "operation":
@@ -27,8 +28,10 @@ class Grid:
                     cell = BlockedNumberCell(r, c, value)
                 elif cell_type == "goal":
                     cell = GoalCell(r, c)
+                    game.goalPos = (r, c)
                 elif cell_type == "player":
                     cell = Player(r, c)
+                    game.player = cell
                 else:
                     cell = EmptyCell(r, c)
                 row_list.append(cell)
@@ -41,6 +44,9 @@ class Grid:
                 row_display += f"{cell.display()}  "
             print(row_display)
         print()
+
+    def check_bounds(self, r, c):
+        return 0 <= r < self.rows and 0 <= c < self.cols    
 
 
 

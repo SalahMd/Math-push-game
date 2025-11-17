@@ -3,7 +3,7 @@ import json
 from model.game import Game
 if __name__ == "__main__":
 
-    with open("grid.json", "r") as file:
+    with open("grid2.json", "r") as file:
         data = json.load(file)
     cells = data["cells"]
     
