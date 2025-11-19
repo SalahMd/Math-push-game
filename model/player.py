@@ -24,35 +24,27 @@ class Player(Cell):
 
         if not grid.check_bounds(new_row, new_col):
             return
-
         next_cell = grid.grid[new_row][new_col]
-
         if next_cell.is_blocked() or next_cell.is_blockedNum():
             return
-
         if next_cell.is_number() or next_cell.is_operation():
-
-            chain = []
+            pushed_cells = []
             cr, cc = new_row, new_col
 
             while grid.check_bounds(cr, cc):
                 cell = grid.grid[cr][cc]
                 if cell.is_number() or cell.is_operation():
-                    chain.append((cr, cc))
+                    pushed_cells.append((cr, cc))
                     cr += dr
                     cc += dc
                 else:
                     break
-
-            if not grid.check_bounds(cr, cc):
-                return
             if not grid.grid[cr][cc].is_empty():
                 return
-
-            for r, c in reversed(chain):
+            for r, c in reversed(pushed_cells):
                 grid.grid[r + dr][c + dc] = grid.grid[r][c]
 
-            first_r, first_c = chain[0]
+            first_r, first_c = pushed_cells[0]
             grid.grid[first_r][first_c] = EmptyCell(first_r, first_c)
 
         grid.grid[self.row][self.col] = EmptyCell(self.row, self.col)

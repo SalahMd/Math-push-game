@@ -1,6 +1,4 @@
-from abc import ABC
-
-class Cell(ABC):
+class Cell():
     def __init__(self, row, col, type="empty", value=None):
         self.row = row
         self.col = col
@@ -31,5 +29,5 @@ class Cell(ABC):
     def is_walkable(self) -> bool:
         return True
 
-    def getPos(self) -> tuple[int, int]:
+    def get_pos(self) -> tuple[int, int]:
         return (self.row, self.col)

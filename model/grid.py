@@ -8,39 +8,41 @@ from .blocked_cell import BlockedCell
 from .empty_cell import EmptyCell
 
 class Grid:
-    def __init__(self, cells,rows,cols,game):
+    def __init__(self, cells, rows, cols, game):
         self.rows = rows
         self.cols = cols
         self.game = game
-        self.grid = []
-        for r, row in enumerate(cells):
-            row_list = []
-            for c, cell_info in enumerate(row):
-                cell_type = cell_info["type"]  
-                value = cell_info.get("value", None) 
-                if cell_type == "number":
-                    cell = NumberCell(r, c, value)
-                elif cell_type == "operation":
-                    cell = OperationCell(r, c, value)
-                elif cell_type == "blocked":
-                    cell = BlockedCell(r, c)
-                elif cell_type == "blocked_number":
-                    cell = BlockedNumberCell(r, c, value)
-                elif cell_type == "goal":
-                    cell = GoalCell(r, c)
-                    game.goalPos = (r, c)
-                elif cell_type == "player":
-                    cell = Player(r, c)
-                    game.player = cell
-                else:
-                    cell = EmptyCell(r, c)
-                row_list.append(cell)
-            self.grid.append(row_list)
+        self.cells = cells
+        self.grid = [[EmptyCell(r, c) for c in range(cols)] for r in range(rows)]
+        
+        for cell in self.cells:
+            cell_type = cell["type"]
+            cell_row = cell["row"]
+            cell_col = cell["col"]
+            
+            if cell_type == "number":
+                cell = NumberCell(cell_row, cell_col, cell['number'])
+            elif cell_type == "operation":
+                cell = OperationCell(cell_row, cell_col, cell['operation'])
+            elif cell_type == "block":
+                cell = BlockedCell(cell_row, cell_col)
+            elif cell_type == "door":
+                cell = BlockedNumberCell(cell_row, cell_col, cell['value'])
+            elif cell_type == "target":
+                cell = GoalCell(cell_row, cell_col)
+                game.goalPos = (cell_row, cell_col)
+            elif cell_type == "agent":
+                cell = Player(cell_row, cell_col)
+                game.player = cell
+            else:
+                cell = EmptyCell(cell_row, cell_col)
+            
+            self.grid[cell_row][cell_col] = cell
  
     def display(self):
-        for r, row in enumerate(self.grid):
+        for row in self.grid:
             row_display = ""
-            for c, cell in enumerate(row):
+            for cell in row:
                 row_display += f"{cell.display()}  "
             print(row_display)
         print()

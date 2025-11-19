@@ -29,7 +29,7 @@ class Game:
                 self.check_if_equal()
 
     def check_win(self):
-        return self.player.getPos() == self.goalPos
+        return self.player.get_pos() == self.goalPos
 
 
     def collect_expression(self, r, c, dr, dc, is_number):
@@ -50,21 +50,17 @@ class Game:
                 cell = self.grid.grid[r][c]
                 if cell.is_number():
                     for dr, dc in directions:
-                        print (dr,dc)
                         expr = self.collect_expression(r, c, dr, dc,True)
                         if expr and expr[-1].isdigit() and any(op in expr for op in "+-*/"):
                             self.remove_blocked_number(expr)
 
     
 
-    def remove_blocked_number(self, expression):
-        try:
-            result = eval(expression)
-            for r in range(self.rows):
-                for c in range(self.cols):
-                    cell = self.grid.grid[r][c]
-                    if cell.is_blockedNum() and int(cell.number) == int(result):
-                        self.grid.grid[r][c] = EmptyCell(r, c)
-                        print(f"Removed blocked number {result} at ({r},{c})")
-        except Exception as e:
-            print("Error evaluating expression:", expression, e)
+    def remove_blocked_number(self, expr):
+        result = eval(expr)
+        for r in range(self.rows):
+            for c in range(self.cols):
+                cell = self.grid.grid[r][c]
+                if cell.is_blockedNum() and cell.number == result:
+                    self.grid.grid[r][c] = EmptyCell(r, c)
+    
