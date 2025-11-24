@@ -5,3 +5,6 @@ class EmptyCell(Cell):
 
     def display(self):
         return "  🟩  "
+    
+    def serialize(self):
+        return super().serialize()

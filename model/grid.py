@@ -19,7 +19,6 @@ class Grid:
             cell_type = cell["type"]
             cell_row = cell["row"]
             cell_col = cell["col"]
-            
             if cell_type == "number":
                 cell = NumberCell(cell_row, cell_col, cell['number'])
             elif cell_type == "operation":
@@ -38,7 +37,7 @@ class Grid:
                 cell = EmptyCell(cell_row, cell_col)
             
             self.grid[cell_row][cell_col] = cell
- 
+
     def display(self):
         for row in self.grid:
             row_display = ""
@@ -50,7 +49,32 @@ class Grid:
     def check_bounds(self, r, c):
         return 0 <= r < self.rows and 0 <= c < self.cols    
 
+    def clone(self, new_game):
+        new_grid = Grid([], self.rows, self.cols, new_game)
+        for r in range(self.rows):
+            for c in range(self.cols):
+                cell = self.grid[r][c]
+                cell_type = getattr(cell, "type", None)
 
+                if cell_type == "player":
+                    new_cell = Player(r, c)
+                    new_game.player = new_cell
+                elif cell_type == "number":
+                    new_cell = NumberCell(r, c, cell.number)
+                elif cell_type == "operation":
+                    new_cell = OperationCell(r, c, cell.operation)
+                elif cell_type == "block":
+                    new_cell = BlockedCell(r, c)
+                elif cell_type == "door":
+                    new_cell = BlockedNumberCell(r, c, cell.number)
+                elif cell_type == "target":
+                    new_cell = GoalCell(r, c)
+                    new_game.goalPos = (r, c)
+                else:  # EmptyCell
+                    new_cell = EmptyCell(r, c)
 
+                new_grid.grid[r][c] = new_cell
+
+        return new_grid
 
 

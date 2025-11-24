@@ -7,3 +7,8 @@ class NumberCell(Cell):
     def display(self):
         emoji_numbers = ["  0️⃣   ","  1️⃣   ","  2️⃣   ","  3️⃣   ","  4️⃣   ","  5️⃣   ","  6️⃣   ","  7️⃣   ","  8️⃣   ","  9️⃣   "]
         return emoji_numbers[int(self.number)] if int(self.number) < 10 else str(self.number)
+    
+    def serialize(self):
+        data = super().serialize()
+        data["value"] = self.number
+        return data

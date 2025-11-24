@@ -6,3 +6,8 @@ class BlockedNumberCell(NumberCell):
 
     def display(self):
         return f"  [{self.number}] "
+    
+    def serialize(self):
+        data = super().serialize()
+        data["value"] = self.number
+        return data

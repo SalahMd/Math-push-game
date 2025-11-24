@@ -31,3 +31,11 @@ class Cell():
 
     def get_pos(self) -> tuple[int, int]:
         return (self.row, self.col)
+    
+
+    def serialize(self):
+        return {
+            "type": self.type,
+            "row": self.row,
+            "col": self.col
+        }

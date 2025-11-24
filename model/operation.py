@@ -7,3 +7,8 @@ class OperationCell(Cell):
     def display(self):
         ops_map = {"+":"  ➕  ","-":"  ➖  ","*":"  ✖️  ","/":"  ➗  "}
         return ops_map.get(self.operation, self.operation)
+    
+    def serialize(self):
+        data = super().serialize()
+        data["operation"] = self.operation
+        return data

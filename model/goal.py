@@ -5,3 +5,6 @@ class GoalCell(Cell):
 
     def display(self):
         return "  🎯  "
+    
+    def serialize(self):
+        return super().serialize()
