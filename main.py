@@ -1,18 +1,21 @@
 import json
-from model.bfs import BFS
 from model.dfs import DFS
+from model.bfs import BFS
+
+
 from model.game import Game
 from model.json import Json
 if __name__ == "__main__":
 
-    file= open("grid3.json")
+    file= open("grid2.json")
     data = json.load(file)
     json_data = Json(data)
     
     game = Game(json_data.cells,json_data.rows,json_data.cols)
-    #game.run()
-    #game.display_grid()
-    #game.get_available_states()
+    
+    # game.run()
+    # game.display_grid()
+    # game.get_available_states()
 
 
     # bfs_solver = BFS(game)

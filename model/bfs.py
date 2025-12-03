@@ -1,65 +1,60 @@
+# model/bfs.py
 from collections import deque
-import copy
 
 class BFS:
     def __init__(self, game):
-        self.game = game
-        self.queue = deque()
-        self.visited = set()
-        self.iteration = 0
+        self.game = game              # original game
+        self.queue = deque()          # queue for BFS
+        self.visited = set()          # visited states
+        self.iteration = 0            # iteration counter
 
-    def serialize_state(self, game):
-        """Serialize grid and player to track visited states"""
-        grid_repr = tuple(
-            tuple(
-                (
-                    cell.number if cell.is_number() else None,
-                    cell.operation if cell.is_operation() else None,
-                    cell.type  # include doors, empty, etc.
-                )
-                for cell in row
-            )
-            for row in game.grid.grid
-        )
-        player_pos = game.player.get_pos()
-        return (grid_repr, player_pos)
+    def enqueue(self, game_instance, path):
+        self.queue.append((game_instance, path))
 
-    def solve(self):
-        # Start BFS with the initial game state
-        self.queue.append((self.game.clone(), []))
+    def dequeue(self):
+        return self.queue.popleft()
 
-        while self.queue:
+    def is_empty(self):
+        return len(self.queue) == 0
+
+    def state_hash(self, game_instance):
+        """
+        Return hashable state for O(1) visited check.
+        """
+        return game_instance.hashable()
+
+    def solve(self, max_iters=1_000_000):
+        # Start BFS with the initial cloned game
+        self.enqueue(self.game.clone(), [])
+
+        while not self.is_empty():
             self.iteration += 1
-            current_game, path = self.queue.popleft()
+            current_game, path = self.dequeue()
 
-            state_id = self.serialize_state(current_game)
+            state_id = self.state_hash(current_game)
             if state_id in self.visited:
                 continue
             self.visited.add(state_id)
 
-            # Evaluate expressions **without changing the grid**
-            current_game.check_if_equal()  # ensure this method is non-destructive
+            # Debug: show current iteration and path length every 1000 iterations
+            if self.iteration % 1000 == 0:
+                print(f"[BFS] Iteration: {self.iteration}, path length: {len(path)}, queue size: {len(self.queue)}, visited: {len(self.visited)}")
 
-            # Check win condition
+            # Check if goal reached
             if current_game.check_win():
-                print(f"BFS solution reached the goal in {len(path)} moves!")
-                print("Moves:", path)
+                print(f"[BFS] Goal reached in {self.iteration} iterations!")
                 return path
 
-            # Generate next states
-            for direction in ["W", "A", "S", "D"]:
-                next_game = current_game.clone()
-                next_game.player.move_player(direction, next_game.grid, next_game)
-                current_game.get_available_states()
+            # Explore available moves
+            for next_game, direction, affected in current_game.get_available_states():
+                sid = self.state_hash(next_game)
+                if sid in self.visited:
+                    continue
+                self.enqueue(next_game, path + [direction])
 
-                # Only enqueue if the state changed
-                next_state_id = self.serialize_state(next_game)
-                if next_state_id not in self.visited:
-                    self.queue.append((next_game, path + [direction]))
-
-            # Optional: debug output
-            if self.iteration % 500 == 0:
-                print(f"Iteration {self.iteration}, queue size: {len(self.queue)}")
+            if self.iteration > max_iters:
+                print("[BFS] Reached iteration limit")
+                break
 
         print("BFS could not reach the goal.")
         return None

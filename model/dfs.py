@@ -1,12 +1,14 @@
+# model/dfs.py
+
 class DFS:
     def __init__(self, game):
-        self.game = game
-        self.stack = []
-        self.visited = set()
-        self.iteration = 0
+        self.game = game           
+        self.stack = []            
+        self.visited = set()        
+        self.iteration = 0          
 
-    def push(self, state, path):
-        self.stack.append((state, path))
+    def push(self, game_instance, path):
+        self.stack.append((game_instance, path))
 
     def pop(self):
         return self.stack.pop()
@@ -14,43 +16,36 @@ class DFS:
     def is_empty(self):
         return len(self.stack) == 0
 
-    def hash_states(self, game):
-        hashed_grid = tuple(
-            tuple(
-                (cell.number if cell.is_number() else None,
-                cell.operation if cell.is_operation() else None)
-                for cell in row
-            )
-            for row in game.grid.grid
-        )
-        player_pos = game.player.get_pos()
-        return (hashed_grid, player_pos)
+    def state_hash(self, game_instance):
+        return game_instance.hashable()
 
-    def solve(self):
+    def solve(self, max_iters=1_000_000):
         self.push(self.game.clone(), [])
+
         while not self.is_empty():
             self.iteration += 1
             current_game, path = self.pop()
-
-            state_id = self.hash_states(current_game)
+            state_id = self.state_hash(current_game)
             if state_id in self.visited:
                 continue
             self.visited.add(state_id)
 
-            current_game.check_if_equal()
-
+            # Check if goal reached
             if current_game.check_win():
                 return path
 
-            for direction in ["W", "A", "S", "D"]:
-                next_game = current_game.clone()
-                next_game.player.move_player(direction, next_game.grid, next_game)
+            # Explore available moves (cloned games)
+            for next_game, direction, affected in current_game.get_available_states():
+                sid = self.state_hash(next_game)
+                if sid in self.visited:
+                    continue
+                self.push(next_game, path + [direction])
 
-                if self.hash_states(next_game) != state_id:
-                    self.push(next_game, path + [direction])
+                print(f"[DFS] iterations: {self.iteration}, visited states: {len(self.visited)}, stack size: {len(self.stack)}")
 
-            if self.iteration % 100 == 0:
-                print(f"visited {self.iteration}")
+            if self.iteration > max_iters:
+                print("[DFS] Reached iteration limit")
+                break
 
         print("DFS could not reach the goal.")
         return None
