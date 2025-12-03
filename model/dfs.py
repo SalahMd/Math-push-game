@@ -3,45 +3,55 @@ class DFS:
         self.game = game
         self.stack = []
         self.visited = set()
+        self.iteration = 0
 
-    def put(self, state, path):
+    def push(self, state, path):
         self.stack.append((state, path))
 
     def pop(self):
-        return self.stack.pop()  # LIFO
-
-    def remove(self, state_id):
-        self.visited.discard(state_id)
+        return self.stack.pop()
 
     def is_empty(self):
         return len(self.stack) == 0
 
+    def serialize_state(self, game):
+        grid_repr = tuple(
+            tuple(
+                (cell.number if cell.is_number() else None,
+                cell.operation if cell.is_operation() else None)
+                for cell in row
+            )
+            for row in game.grid.grid
+        )
+        player_pos = game.player.get_pos()
+        return (grid_repr, player_pos)
+
     def solve(self):
-        self.put(self.game, [])
+        self.push(self.game.clone(), [])
         while not self.is_empty():
+            self.iteration += 1
             current_game, path = self.pop()
 
-            state_id = tuple(
-            tuple(tuple(sorted(cell.serialize().items())) for cell in row)
-            for row in current_game.grid.grid
-            )
-
-
+            state_id = self.serialize_state(current_game)
             if state_id in self.visited:
                 continue
             self.visited.add(state_id)
 
+            current_game.check_if_equal()
+
             if current_game.check_win():
                 return path
 
-            for next_game in current_game.get_available_states():
-                move_taken = None
-                for direction in ["W", "A", "S", "D"]:
-                    temp_game = current_game.clone()
-                    temp_game.player.move_player(direction, temp_game.grid, temp_game)
-                    if tuple(tuple(cell.serialize() for cell in row) for row in temp_game.grid.grid) == \
-                       tuple(tuple(cell.serialize() for cell in row) for row in next_game.grid.grid):
-                        move_taken = direction
-                        break
-                self.put(next_game, path + [move_taken])
+            for direction in ["W", "A", "S", "D"]:
+                next_game = current_game.clone()
+                next_game.player.move_player(direction, next_game.grid, next_game)
+
+                # Only push if the state changed
+                if self.serialize_state(next_game) != state_id:
+                    self.push(next_game, path + [direction])
+
+            if self.iteration % 100 == 0:
+                print(f"Iteration {self.iteration}, stack size: {len(self.stack)}")
+
+        print("DFS could not reach the goal.")
         return None

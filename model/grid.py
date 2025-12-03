@@ -38,8 +38,8 @@ class Grid:
             
             self.grid[cell_row][cell_col] = cell
 
-    def display(self):
-        for row in self.grid:
+    def display(grid):
+        for row in grid:
             row_display = ""
             for cell in row:
                 row_display += f"{cell.display()}  "
@@ -63,11 +63,11 @@ class Grid:
                     new_cell = NumberCell(r, c, cell.number)
                 elif cell_type == "operation":
                     new_cell = OperationCell(r, c, cell.operation)
-                elif cell_type == "block":
+                elif cell_type in ["block",'blocked']:
                     new_cell = BlockedCell(r, c)
-                elif cell_type == "door":
+                elif cell_type in ["door",'blocked_number']:
                     new_cell = BlockedNumberCell(r, c, cell.number)
-                elif cell_type == "target":
+                elif cell_type in ["target",'goal']:
                     new_cell = GoalCell(r, c)
                     new_game.goalPos = (r, c)
                 else:  # EmptyCell

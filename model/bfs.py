@@ -1,52 +1,64 @@
 from collections import deque
+import copy
 
 class BFS:
     def __init__(self, game):
         self.game = game
         self.queue = deque()
         self.visited = set()
+        self.iteration = 0
 
-    def put(self, state, path):
-        """Add state to the queue."""
-        self.queue.append((state, path))
-
-    def pop(self):
-        """Pop from the queue (FIFO)."""
-        return self.queue.popleft()
-
-    def remove(self, state_id):
-        """Optional: remove a state from visited if needed."""
-        self.visited.discard(state_id)
-
-    def is_empty(self):
-        return len(self.queue) == 0
+    def serialize_state(self, game):
+        """Serialize grid and player to track visited states"""
+        grid_repr = tuple(
+            tuple(
+                (
+                    cell.number if cell.is_number() else None,
+                    cell.operation if cell.is_operation() else None,
+                    cell.type  # include doors, empty, etc.
+                )
+                for cell in row
+            )
+            for row in game.grid.grid
+        )
+        player_pos = game.player.get_pos()
+        return (grid_repr, player_pos)
 
     def solve(self):
-        self.put(self.game, [])
-        while not self.is_empty():
-            current_game, path = self.pop()
+        # Start BFS with the initial game state
+        self.queue.append((self.game.clone(), []))
 
-            state_id = tuple(
-            tuple(tuple(sorted(cell.serialize().items())) for cell in row)
-            for row in current_game.grid.grid
-            )
+        while self.queue:
+            self.iteration += 1
+            current_game, path = self.queue.popleft()
 
-
+            state_id = self.serialize_state(current_game)
             if state_id in self.visited:
                 continue
             self.visited.add(state_id)
 
+            # Evaluate expressions **without changing the grid**
+            current_game.check_if_equal()  # ensure this method is non-destructive
+
+            # Check win condition
             if current_game.check_win():
+                print(f"BFS solution reached the goal in {len(path)} moves!")
+                print("Moves:", path)
                 return path
 
-            for next_game in current_game.get_available_states():
-                move_taken = None
-                for direction in ["W", "A", "S", "D"]:
-                    temp_game = current_game.clone()
-                    temp_game.player.move_player(direction, temp_game.grid, temp_game)
-                    if tuple(tuple(cell.serialize() for cell in row) for row in temp_game.grid.grid) == \
-                       tuple(tuple(cell.serialize() for cell in row) for row in next_game.grid.grid):
-                        move_taken = direction
-                        break
-                self.put(next_game, path + [move_taken])
+            # Generate next states
+            for direction in ["W", "A", "S", "D"]:
+                next_game = current_game.clone()
+                next_game.player.move_player(direction, next_game.grid, next_game)
+
+                # Only enqueue if the state changed
+                next_state_id = self.serialize_state(next_game)
+                if next_state_id not in self.visited:
+                    self.queue.append((next_game, path + [direction]))
+
+            # Optional: debug output
+            if self.iteration % 500 == 0:
+                print(f"Iteration {self.iteration}, queue size: {len(self.queue)}")
+
+        print("BFS could not reach the goal.")
         return None
