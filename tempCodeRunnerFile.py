@@ -1,3 +1,1 @@
-dfs_solver = DFS(game)
-    solution_dfs = dfs_solver.solve()
-    print("DFS solution:", solution_dfs)
+game.get_available_states()

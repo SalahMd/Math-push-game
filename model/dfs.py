@@ -14,8 +14,8 @@ class DFS:
     def is_empty(self):
         return len(self.stack) == 0
 
-    def serialize_state(self, game):
-        grid_repr = tuple(
+    def hash_states(self, game):
+        hashed_grid = tuple(
             tuple(
                 (cell.number if cell.is_number() else None,
                 cell.operation if cell.is_operation() else None)
@@ -24,7 +24,7 @@ class DFS:
             for row in game.grid.grid
         )
         player_pos = game.player.get_pos()
-        return (grid_repr, player_pos)
+        return (hashed_grid, player_pos)
 
     def solve(self):
         self.push(self.game.clone(), [])
@@ -32,7 +32,7 @@ class DFS:
             self.iteration += 1
             current_game, path = self.pop()
 
-            state_id = self.serialize_state(current_game)
+            state_id = self.hash_states(current_game)
             if state_id in self.visited:
                 continue
             self.visited.add(state_id)
@@ -46,12 +46,11 @@ class DFS:
                 next_game = current_game.clone()
                 next_game.player.move_player(direction, next_game.grid, next_game)
 
-                # Only push if the state changed
-                if self.serialize_state(next_game) != state_id:
+                if self.hash_states(next_game) != state_id:
                     self.push(next_game, path + [direction])
 
             if self.iteration % 100 == 0:
-                print(f"Iteration {self.iteration}, stack size: {len(self.stack)}")
+                print(f"visited {self.iteration}")
 
         print("DFS could not reach the goal.")
         return None

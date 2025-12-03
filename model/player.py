@@ -37,9 +37,6 @@ class Player(Cell):
         if next_cell.is_blocked() or next_cell.is_blockedNum():
             return
 
-        if next_cell.is_goal() and game.has_blocked_numbers():
-            return
-
         if next_cell.is_empty() or next_cell.is_goal():
             grid.grid[self.row][self.col] = EmptyCell(self.row, self.col)
             self.row, self.col = new_row, new_col

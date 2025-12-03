@@ -50,6 +50,7 @@ class BFS:
             for direction in ["W", "A", "S", "D"]:
                 next_game = current_game.clone()
                 next_game.player.move_player(direction, next_game.grid, next_game)
+                current_game.get_available_states()
 
                 # Only enqueue if the state changed
                 next_state_id = self.serialize_state(next_game)

@@ -80,29 +80,27 @@ class Game:
     def clone(self):
         new_game = Game([], self.rows, self.cols)
         new_game.goalPos = self.goalPos
-
         new_game.grid = self.grid.clone(new_game)
-
         for r in range(self.rows):
             for c in range(self.cols):
                 if new_game.grid.grid[r][c].type == "player":
                     new_game.player = new_game.grid.grid[r][c]
-
         return new_game
 
-    # ============================
-    # GENERATE NEXT STATES
-    # ============================
+
     def get_available_states(self):
         states = []
         for move in ["W", "A", "S", "D"]:
             new_game = self.clone()
             old_pos = new_game.player.get_pos()
-
             new_game.player.move_player(move, new_game.grid, new_game)
-            new_game.check_if_equal()
+            for row in new_game.grid.grid:
+                row_display = ""
+                for cell in row:
+                    row_display += f"{cell.display()}  "
+                print(row_display)
+            print()
 
             if new_game.player.get_pos() != old_pos:
                 states.append(new_game)
-
         return states

@@ -10,8 +10,9 @@ if __name__ == "__main__":
     json_data = Json(data)
     
     game = Game(json_data.cells,json_data.rows,json_data.cols)
-
-    game.get_available_states()
+    #game.run()
+    #game.display_grid()
+    #game.get_available_states()
 
 
     # bfs_solver = BFS(game)
@@ -19,9 +20,9 @@ if __name__ == "__main__":
     # print("BFS solution:", solution_bfs)
 
 
-    # dfs_solver = DFS(game)
-    # solution_dfs = dfs_solver.solve()
-    # print("DFS solution:", solution_dfs)
+    dfs_solver = DFS(game)
+    solution_dfs = dfs_solver.solve()
+    print("path", solution_dfs)
 
     # for move in solution_dfs:
     #     game.player.move_player(move, game.grid, game)

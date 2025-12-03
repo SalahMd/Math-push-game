@@ -38,8 +38,8 @@ class Grid:
             
             self.grid[cell_row][cell_col] = cell
 
-    def display(grid):
-        for row in grid:
+    def display(self):
+        for row in self.grid:
             row_display = ""
             for cell in row:
                 row_display += f"{cell.display()}  "
