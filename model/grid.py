@@ -70,7 +70,7 @@ class Grid:
                 elif cell_type in ["target",'goal']:
                     new_cell = GoalCell(r, c)
                     new_game.goalPos = (r, c)
-                else:  # EmptyCell
+                else: 
                     new_cell = EmptyCell(r, c)
 
                 new_grid.grid[r][c] = new_cell

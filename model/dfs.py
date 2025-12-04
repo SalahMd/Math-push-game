@@ -19,7 +19,7 @@ class DFS:
     def state_hash(self, game_instance):
         return game_instance.hashable()
 
-    def solve(self, max_iters=1_000_000):
+    def solve(self):
         self.push(self.game.clone(), [])
 
         while not self.is_empty():
@@ -30,22 +30,16 @@ class DFS:
                 continue
             self.visited.add(state_id)
 
-            # Check if goal reached
             if current_game.check_win():
                 return path
 
-            # Explore available moves (cloned games)
             for next_game, direction, affected in current_game.get_available_states():
                 sid = self.state_hash(next_game)
                 if sid in self.visited:
                     continue
                 self.push(next_game, path + [direction])
+                if self.iteration % 1000 == 0:
+                    print(f"iterations: {self.iteration}, visited states: {len(self.visited)}")
 
-                print(f"[DFS] iterations: {self.iteration}, visited states: {len(self.visited)}, stack size: {len(self.stack)}")
-
-            if self.iteration > max_iters:
-                print("[DFS] Reached iteration limit")
-                break
-
-        print("DFS could not reach the goal.")
+        print("could not reach the goal.")
         return None

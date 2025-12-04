@@ -27,7 +27,6 @@ class Game:
             if self.check_win():
                 print("Congrats, you won")
                 break
-
             direction = input("Enter W-A-S-D or Q to quit:  ").upper()
             if direction == "Q":
                 is_finished = True
@@ -100,59 +99,52 @@ class Game:
         self.goalPos = goal_pos
 
 
-
-
     def check_if_equal(self, affected_positions=None):
-        directions = [ (0,1), (0,-1), (1,0), (-1,0) ]
-        rows_to_check = set()
-        cols_to_check = set()
-
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        
         if not affected_positions:
-            rows_to_check = set(range(self.rows))
-            cols_to_check = set(range(self.cols))
+            rows_to_check = range(self.rows)
+            cols_to_check = range(self.cols)
         else:
-            for r,c in affected_positions:
-                rows_to_check.add(r)
-                cols_to_check.add(c)
+            rows_to_check = {r for r, _ in affected_positions}
+            cols_to_check = {c for _, c in affected_positions}
 
-        # Check by rows (iterate target rows and all columns in those rows)
+        # Check rows
         for r in rows_to_check:
             for c in range(self.cols):
                 cell = self.grid.grid[r][c]
-                if cell.is_number():
-                    for dr, dc in directions:
-                        expr = self.collect_expression(r, c, dr, dc, True)
-                        if expr and expr[-1].isdigit() and any(op in expr for op in "+-*/"):
-                            try:
-                                # evaluate safely (you have safe_eval but expr is chars only)
-                                res = eval(expr)
-                            except Exception:
-                                continue
-                            self.remove_blocked_number_by_value(res)
+                if not cell.is_number():
+                    continue
+                for dr, dc in directions:
+                    expr = self.collect_expression(r, c, dr, dc, True)
+                    if expr and expr[-1].isdigit() and any(op in expr for op in "+-*/"):
+                        try:
+                            value = eval(expr)
+                            self.remove_blocked_number_by_value(value)
+                        except Exception:
+                            continue
 
-        # Check by columns (columns not covered in rows if needed)
+        # Check columns
         for c in cols_to_check:
             for r in range(self.rows):
                 cell = self.grid.grid[r][c]
-                if cell.is_number():
-                    for dr, dc in directions:
-                        expr = self.collect_expression(r, c, dr, dc, True)
-                        if expr and expr[-1].isdigit() and any(op in expr for op in "+-*/"):
-                            try:
-                                res = eval(expr)
-                            except Exception:
-                                continue
-                            self.remove_blocked_number_by_value(res)
+                if not cell.is_number():
+                    continue
+                for dr, dc in directions:
+                    expr = self.collect_expression(r, c, dr, dc, True)
+                    if expr and expr[-1].isdigit() and any(op in expr for op in "+-*/"):
+                        try:
+                            value = eval(expr)
+                            self.remove_blocked_number_by_value(value)
+                        except Exception:
+                            continue
+
 
     def remove_blocked_number_by_value(self, value):
-        """
-        Remove any blocked-number (door) cell whose number equals value.
-        """
         for r in range(self.rows):
             for c in range(self.cols):
                 cell = self.grid.grid[r][c]
                 if cell.is_blockedNum() and cell.number == value:
-                    # replace with empty
                     self.grid.grid[r][c] = EmptyCell(r, c)
 
     def clone(self):
@@ -167,18 +159,14 @@ class Game:
 
     def get_available_states(self):
         states = []
-        for move in ["W", "A", "D", "S"]:
-            # for row in self.grid.grid:
-            #     row_display = ""
-            #     for cell in row:
-            #         row_display += f"{cell.display()}  "
-            #     print(row_display)
-            # print()
+        for move in ["W", "A", "S", "D"]:
             new_game = self.clone()
             old_pos = new_game.player.get_pos()
             moved, affected = new_game.player.move_player(move, new_game.grid, new_game)
+
             if moved and new_game.player.get_pos() != old_pos:
-                # After move, perform incremental check only on affected positions
                 new_game.check_if_equal(affected)
                 states.append((new_game, move, affected))
+                
         return states
+
