@@ -13,8 +13,6 @@ class Player(Cell):
         self.row = r
         self.col = c
     def display(self): return "  🤖  "    
-
-
     
 
     def move_player(self, direction, grid, game):
@@ -26,18 +24,18 @@ class Player(Cell):
         }
 
         if direction not in directions:
-            return False, []
+            return  []
 
         dr, dc = directions[direction]
         new_row, new_col = self.row + dr, self.col + dc
 
         if not grid.check_bounds(new_row, new_col):
-            return False, []
+            return  []
 
         next_cell = grid.grid[new_row][new_col]
         
         if next_cell.is_blocked() or next_cell.is_blockedNum():
-            return False, []
+            return  []
 
         affected = []
         if next_cell.is_empty() or next_cell.is_goal():
@@ -48,7 +46,7 @@ class Player(Cell):
             self.row, self.col = new_row, new_col
             grid.grid[self.row][self.col] = self
             game.playerPos = (self.row, self.col)
-            return True, affected
+            return  affected
 
         if next_cell.is_number() or next_cell.is_operation():
             pushed_cells = []
@@ -60,9 +58,9 @@ class Player(Cell):
                 cc += dc
 
             if not grid.check_bounds(cr, cc):
-                return False, []
+                return  []
             if not grid.grid[cr][cc].is_empty():
-                return False, []
+                return  []
 
             for r, c in reversed(pushed_cells):
                 grid.grid[r + dr][c + dc] = grid.grid[r][c]
@@ -81,6 +79,6 @@ class Player(Cell):
             game.playerPos = (self.row, self.col)
 
             affected = list({(r, c) for (r, c) in affected})
-            return True, affected
+            return affected
 
-        return False, []
+        return  []

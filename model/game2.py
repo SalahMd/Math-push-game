@@ -37,6 +37,17 @@ class Game:
                 else:
                     print("Can't move")
 
+    def safe_eval(self, tokens):
+        try:
+            expr = ""
+            for t in tokens:
+                if t in "+-*/" or t.isdigit():
+                    expr += t
+                else:
+                    return None
+            return eval(expr)
+        except:
+            return None
 
     def check_win(self):
         return self.player.get_pos() == self.goalPos
@@ -51,6 +62,7 @@ class Game:
             return ""
         value = str(cell.number if is_number else cell.operation)
         return value + self.collect_expression(r + dr, c + dc, dr, dc, not is_number)
+    
     def hashable(self):
         rows = []
         for r in range(self.rows):
@@ -63,12 +75,40 @@ class Game:
 
 
 
+    def load_state(self, state):
+        grid_state, player_pos, goal_pos = state
+
+        for r in range(self.rows):
+            for c in range(self.cols):
+                cell_type, number, operation = grid_state[r][c]
+                if cell_type == "player":
+                    self.player.set_pos(r, c)
+                    self.grid.grid[r][c] = self.player
+                elif cell_type == "number":
+                    self.grid.grid[r][c] = NumberCell(r, c, number)
+                elif cell_type == "operation":
+                    self.grid.grid[r][c] = OperationCell(r, c, operation)
+                elif cell_type in ["block","blocked"]:
+                    self.grid.grid[r][c] = BlockedCell(r, c)
+                elif cell_type in ["door","blocked_number"]:
+                    self.grid.grid[r][c] = BlockedNumberCell(r, c, number)
+                elif cell_type in ["target","goal"]:
+                    self.grid.grid[r][c] = GoalCell(r, c)
+                else:
+                    self.grid.grid[r][c] = EmptyCell(r, c)
+
+        self.goalPos = goal_pos
+
 
     def check_if_equal(self, affected_positions=None):
         directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         
-        rows_to_check = {r for r, _ in affected_positions}
-        cols_to_check = {c for _, c in affected_positions}
+        if not affected_positions:
+            rows_to_check = range(self.rows)
+            cols_to_check = range(self.cols)
+        else:
+            rows_to_check = {r for r, _ in affected_positions}
+            cols_to_check = {c for _, c in affected_positions}
 
         # Check rows
         for r in rows_to_check:
@@ -106,7 +146,15 @@ class Game:
             for c in range(self.cols):
                 cell = self.grid.grid[r][c]
                 if cell.is_blockedNum() and cell.number == value:
+                    # print('remove door')
+                    
                     self.grid.grid[r][c] = EmptyCell(r, c)
+                    # for row in self.grid.grid:
+                    #     row_display = ""
+                    #     for cell in row:
+                    #         row_display += f"{cell.display()}  "
+                    #     print(row_display)
+                    # print()
 
     def clone(self):
         new_game = Game([], self.rows, self.cols)
@@ -122,11 +170,12 @@ class Game:
         states = []
         for move in ["A", "S", "D", "W"]:
             new_game = self.clone()
-            affected = new_game.player.move_player(move, new_game.grid, new_game)
+            old_pos = new_game.player.get_pos()
+            moved, affected = new_game.player.move_player(move, new_game.grid, new_game)
 
-            if affected is not None :
+            if moved and new_game.player.get_pos() != old_pos:
                 new_game.check_if_equal(affected)
-                states.append((new_game, move))
+                states.append((new_game, move, affected))
                 
         return states
 

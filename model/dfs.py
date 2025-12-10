@@ -8,6 +8,7 @@ class DFS:
         self.iteration = 0          
 
     def push(self, game_instance, path):
+        
         self.stack.append((game_instance, path))
 
     def pop(self):
@@ -29,17 +30,19 @@ class DFS:
             if state_id in self.visited:
                 continue
             self.visited.add(state_id)
-
+            if self.iteration % 3000 == 0:
+                print(f"iterations: {self.iteration}, visited states: {len(self.visited)}")
             if current_game.check_win():
+                print(f"Goal reached in {self.iteration} iterations!")
                 return path
 
-            for next_game, direction, affected in current_game.get_available_states():
+            for next_game, direction in current_game.get_available_states():
                 sid = self.state_hash(next_game)
                 if sid in self.visited:
                     continue
                 self.push(next_game, path + [direction])
-                if self.iteration % 1000 == 0:
-                    print(f"iterations: {self.iteration}, visited states: {len(self.visited)}")
+                
+               
 
         print("could not reach the goal.")
         return None

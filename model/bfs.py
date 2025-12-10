@@ -21,30 +21,34 @@ class BFS:
         return game_instance.hashable()
 
     def solve(self):
-        self.enqueue(self.game.clone(), [])
+        # 1. Setup initial state
+        initial_state = self.game.clone()
+        initial_hash = self.state_hash(initial_state)
+        
+        self.enqueue(initial_state, [])
+        self.visited.add(initial_hash) # Mark start as visited immediately
 
         while not self.is_empty():
             self.iteration += 1
             current_game, path = self.dequeue()
 
-            state_id = self.state_hash(current_game)
-            if state_id in self.visited:
-                continue
-            self.visited.add(state_id)
-
+            # Debugging print
             if self.iteration % 1000 == 0:
-                print(f"Iteration: {self.iteration}, path length: {len(path)}")
+                print(f"Iteration: {self.iteration}, Path len: {len(path)}, Queue size: {len(self.queue)}")
 
+            # Check win
             if current_game.check_win():
                 print(f"[BFS] Goal reached in {self.iteration} iterations!")
                 return path
 
-            for next_game, direction, affected in current_game.get_available_states():
+            # 2. Get neighbors
+            for next_game, direction in current_game.get_available_states():
                 sid = self.state_hash(next_game)
-                if sid in self.visited:
-                    continue
-                self.enqueue(next_game, path + [direction])
+                
+                # Only enqueue if NOT visited
+                if sid not in self.visited:
+                    self.visited.add(sid) 
+                    self.enqueue(next_game, path + [direction])
 
-
-        print("could not reach the goal.")
+        print("Could not reach the goal.")
         return None
