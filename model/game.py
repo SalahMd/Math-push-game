@@ -51,15 +51,32 @@ class Game:
             return ""
         value = str(cell.number if is_number else cell.operation)
         return value + self.collect_expression(r + dr, c + dc, dr, dc, not is_number)
+    
     def hashable(self):
-        rows = []
+        important = []
         for r in range(self.rows):
-            row_tuple = tuple(
-                (cell.type, getattr(cell, "number", None), getattr(cell, "operation", None))
-                for cell in self.grid.grid[r]
-            )
-            rows.append(row_tuple)
-        return (tuple(rows), self.player.get_pos(), self.goalPos)
+            row_state = []
+            for cell in self.grid.grid[r]:
+                if cell.type in ("empty", "blocked",'goal','target','door','blocked_number'):  
+                    row_state.append(None)
+                    continue
+                if cell.is_number():
+                    row_state.append(("num", cell.number))
+                    continue
+                if cell.is_operation():
+                    row_state.append(("op", cell.operation))
+                    continue
+                if cell.type == "player":
+                    row_state.append(("P", cell.get_pos()))
+                    continue
+                
+                row_state.append(cell.type)
+
+            important.append(tuple(row_state))
+
+        return (tuple(important), self.player.get_pos())
+
+
 
 
 
@@ -117,11 +134,27 @@ class Game:
                 if new_game.grid.grid[r][c].type == "player":
                     new_game.player = new_game.grid.grid[r][c]
         return new_game
+    
+    def clone1(self):
+        new_game = Game.__new__(Game)   # no init
+        new_game.rows = self.rows
+        new_game.cols = self.cols
+        new_game.goalPos = self.goalPos
+
+        # Clone grid ultra-fast
+        new_game.grid = self.grid.fast_clone(new_game)
+
+        # Player already set during cloning
+        return new_game
+
+
+
+
 
     def get_available_states(self):
         states = []
         for move in ["A", "S", "D", "W"]:
-            new_game = self.clone()
+            new_game = self.clone1()
             affected = new_game.player.move_player(move, new_game.grid, new_game)
 
             if affected is not None :

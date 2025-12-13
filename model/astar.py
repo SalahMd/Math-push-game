@@ -29,7 +29,7 @@ class AStar:
                 print(f"[A*] Goal reached in {self.iteration} iterations!")
                 return path
 
-            for next_game, direction, affected in current_game.get_available_states():
+            for next_game, direction in current_game.get_available_states():
                 state_id = next_game.hashable()
                 if state_id in self.visited:
                     continue

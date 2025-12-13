@@ -39,14 +39,11 @@ class Player(Cell):
 
         affected = []
         if next_cell.is_empty() or next_cell.is_goal():
-            affected.append((self.row, self.col))
-            affected.append((new_row, new_col))
-
             grid.grid[self.row][self.col] = EmptyCell(self.row, self.col)
             self.row, self.col = new_row, new_col
             grid.grid[self.row][self.col] = self
             game.playerPos = (self.row, self.col)
-            return  affected
+            return  []
 
         if next_cell.is_number() or next_cell.is_operation():
             pushed_cells = []
@@ -58,27 +55,23 @@ class Player(Cell):
                 cc += dc
 
             if not grid.check_bounds(cr, cc):
-                return  []
+                return []
             if not grid.grid[cr][cc].is_empty():
-                return  []
+                return []
 
             for r, c in reversed(pushed_cells):
                 grid.grid[r + dr][c + dc] = grid.grid[r][c]
                 affected.append((r + dr, c + dc))
-                affected.append((r, c))
 
             first_r, first_c = pushed_cells[0]
             grid.grid[first_r][first_c] = EmptyCell(first_r, first_c)
-
-            affected.append((self.row, self.col))
-            affected.append((new_row, new_col))
 
             grid.grid[self.row][self.col] = EmptyCell(self.row, self.col)
             self.row, self.col = new_row, new_col
             grid.grid[self.row][self.col] = self
             game.playerPos = (self.row, self.col)
 
-            affected = list({(r, c) for (r, c) in affected})
-            return affected
+
+            return list({(r, c) for (r, c) in affected})
 
         return  []

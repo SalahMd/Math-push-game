@@ -76,5 +76,36 @@ class Grid:
                 new_grid.grid[r][c] = new_cell
 
         return new_grid
+    # grid.py
+    def fast_clone(self, new_game):
+        new_grid = Grid.__new__(Grid)
+        new_grid.rows = self.rows
+        new_grid.cols = self.cols
+        new_grid.game = new_game
+        new_grid.grid = [[None]*self.cols for _ in range(self.rows)]
+
+        for r in range(self.rows):
+            for c in range(self.cols):
+                cell = self.grid[r][c]
+                t = cell.type
+                if t == "player":
+                    new_cell = Player(r, c)
+                    new_game.player = new_cell
+                elif t == "number":
+                    new_cell = NumberCell(r, c, cell.number)
+                elif t == "operation":
+                    new_cell = OperationCell(r, c, cell.operation)
+                elif t in ("block", "blocked"):
+                    new_cell = BlockedCell(r, c)
+                elif t in ("door", "blocked_number"):
+                    new_cell = BlockedNumberCell(r, c, cell.number)
+                elif t in ("goal", "target"):
+                    new_cell = GoalCell(r, c)
+                    new_game.goalPos = (r, c)
+                else:
+                    new_cell = EmptyCell(r, c)
+                new_grid.grid[r][c] = new_cell
+
+        return new_grid
 
 
