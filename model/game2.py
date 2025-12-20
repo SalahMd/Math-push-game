@@ -32,10 +32,11 @@ class Game:
                 is_finished = True
             else:
                 moved, affected = self.player.move_player(direction, self.grid, self)
-                if moved:
-                    self.check_if_equal(affected)
-                else:
+                if not moved:
                     print("Can't move")
+                    continue
+                if affected:
+                    self.check_if_equal(affected)
 
     def safe_eval(self, tokens):
         try:
@@ -174,7 +175,8 @@ class Game:
             moved, affected = new_game.player.move_player(move, new_game.grid, new_game)
 
             if moved and new_game.player.get_pos() != old_pos:
-                new_game.check_if_equal(affected)
+                if affected:
+                    new_game.check_if_equal(affected)
                 states.append((new_game, move, affected))
                 
         return states

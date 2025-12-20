@@ -1,6 +1,3 @@
-# model/dfs.py
-import time
-
 class DFS:
     def __init__(self, game):
         self.game = game           
@@ -22,9 +19,6 @@ class DFS:
 
     def solve(self):
         self.push(self.game, [])
-        start_time = time.time()
-        last_time = start_time
-
         while not self.is_empty():
             self.iteration += 1
             current_game, path = self.pop()
@@ -34,26 +28,19 @@ class DFS:
             self.visited.add(state_id)
 
             if self.iteration % 1000 == 0:
-                now = time.time()
-                elapsed = now - last_time
-                total_elapsed = now - start_time
-                print(f"Iteration: {self.iteration}, Stack size: {len(self.stack)}, "
+                print(f"Iteration: {self.iteration},"
                       f"Visited states: {len(self.visited)}, "
-                      f"Time per 1000 iters: {elapsed:.3f}s, Total time: {total_elapsed:.3f}s")
-                last_time = now
-
+                      )
             if current_game.check_win():
-                total_time = time.time() - start_time
-                print(f"Goal reached in {self.iteration} iterations! Total time: {total_time:.3f}s")
+                print(f"You Won\nVisited states: {len(self.visited)}")
                 return path
 
             for next_game, direction in current_game.get_available_states():
-                
-                sid = self.state_hash(next_game)
-                if sid in self.visited:
+                id = self.state_hash(next_game)
+                if id in self.visited:
                     continue
                 self.visited.add(state_id)
                 self.push(next_game, path + [direction])
 
-        print("could not reach the goal.")
+        print("No solution")
         return None

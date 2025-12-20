@@ -7,6 +7,13 @@ from model.number_cell import NumberCell
 from model.operation import OperationCell
 from .empty_cell import EmptyCell
 
+DIRECTIONS = (
+    ("A", (0, -1)),
+    ("S", (1, 0)),
+    ("D", (0, 1)),
+    ("W", (-1, 0)),
+)
+
 class Game:
 
     def __init__(self, cells, rows, cols):
@@ -32,10 +39,11 @@ class Game:
                 is_finished = True
             else:
                 moved, affected = self.player.move_player(direction, self.grid, self)
-                if moved:
-                    self.check_if_equal(affected)
-                else:
+                if not moved:
                     print("Can't move")
+                    continue
+                if affected:
+                    self.check_if_equal(affected)
 
 
     def check_win(self):
@@ -53,32 +61,22 @@ class Game:
         return value + self.collect_expression(r + dr, c + dc, dr, dc, not is_number)
     
     def hashable(self):
-        important = []
+        pieces = []
+        grid_cells = self.grid.grid
         for r in range(self.rows):
-            row_state = []
-            for cell in self.grid.grid[r]:
-                if cell.type in ("empty", "blocked",'goal','target','door','blocked_number'):  
-                    row_state.append(None)
-                    continue
-                if cell.is_number():
-                    row_state.append(("num", cell.number))
-                    continue
-                if cell.is_operation():
-                    row_state.append(("op", cell.operation))
-                    continue
-                if cell.type == "player":
-                    row_state.append(("P", cell.get_pos()))
-                    continue
-                
-                row_state.append(cell.type)
-
-            important.append(tuple(row_state))
-
-        return (tuple(important), self.player.get_pos())
-
-
-
-
+            row = grid_cells[r]
+            for c in range(self.cols):
+                cell = row[c]
+                t = cell.type
+                if t == "player":
+                    pieces.append(("p", r, c))
+                elif t == "number":
+                    pieces.append(("n", cell.number, r, c))
+                elif t == "operation":
+                    pieces.append(("o", cell.operation, r, c))
+                elif t in ("blocked_number", "door"):
+                    pieces.append(("d", cell.number, r, c))
+        return tuple(pieces)
 
 
     def check_if_equal(self, affected_positions=None):
@@ -86,8 +84,6 @@ class Game:
         
         rows_to_check = {r for r, _ in affected_positions}
         cols_to_check = {c for _, c in affected_positions}
-
-        # Check rows
         for r in rows_to_check:
             for c in range(self.cols):
                 cell = self.grid.grid[r][c]
@@ -101,8 +97,6 @@ class Game:
                             self.remove_blocked_number_by_value(value)
                         except Exception:
                             continue
-
-        # Check columns
         for c in cols_to_check:
             for r in range(self.rows):
                 cell = self.grid.grid[r][c]
@@ -125,41 +119,26 @@ class Game:
                 if cell.is_blockedNum() and cell.number == value:
                     self.grid.grid[r][c] = EmptyCell(r, c)
 
-    def clone(self):
-        new_game = Game([], self.rows, self.cols)
-        new_game.goalPos = self.goalPos
-        new_game.grid = self.grid.clone(new_game)
-        for r in range(self.rows):
-            for c in range(self.cols):
-                if new_game.grid.grid[r][c].type == "player":
-                    new_game.player = new_game.grid.grid[r][c]
-        return new_game
-    
+
     def clone1(self):
-        new_game = Game.__new__(Game)   # no init
+        new_game = Game.__new__(Game)
         new_game.rows = self.rows
         new_game.cols = self.cols
         new_game.goalPos = self.goalPos
-
-        # Clone grid ultra-fast
         new_game.grid = self.grid.fast_clone(new_game)
-
-        # Player already set during cloning
         return new_game
-
-
-
 
 
     def get_available_states(self):
         states = []
         for move in ["A", "S", "D", "W"]:
             new_game = self.clone1()
-            affected = new_game.player.move_player(move, new_game.grid, new_game)
-
+            moved,affected = new_game.player.move_player(move, new_game.grid, new_game)
+            if not moved:
+                continue
             if affected is not None :
                 new_game.check_if_equal(affected)
                 states.append((new_game, move))
                 
-        return states
+        return states  
 

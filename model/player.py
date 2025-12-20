@@ -2,6 +2,14 @@
 from .empty_cell import EmptyCell
 from .cell import Cell
 
+MOVE_DIRS = {
+    "W": (-1, 0),
+    "S": (1, 0),
+    "A": (0, -1),
+    "D": (0, 1),
+}
+
+
 class Player(Cell):
     def __init__(self, row, col):
         super().__init__(row, col, type="player")
@@ -16,26 +24,19 @@ class Player(Cell):
     
 
     def move_player(self, direction, grid, game):
-        directions = {
-            "W": (-1, 0),
-            "S": (1, 0),
-            "A": (0, -1),
-            "D": (0, 1),
-        }
+        if direction not in MOVE_DIRS:
+            return False, []
 
-        if direction not in directions:
-            return  []
-
-        dr, dc = directions[direction]
+        dr, dc = MOVE_DIRS[direction]
         new_row, new_col = self.row + dr, self.col + dc
 
         if not grid.check_bounds(new_row, new_col):
-            return  []
+            return False, []
 
         next_cell = grid.grid[new_row][new_col]
         
         if next_cell.is_blocked() or next_cell.is_blockedNum():
-            return  []
+            return False, []
 
         affected = []
         if next_cell.is_empty() or next_cell.is_goal():
@@ -43,7 +44,7 @@ class Player(Cell):
             self.row, self.col = new_row, new_col
             grid.grid[self.row][self.col] = self
             game.playerPos = (self.row, self.col)
-            return  []
+            return True, []
 
         if next_cell.is_number() or next_cell.is_operation():
             pushed_cells = []
@@ -55,9 +56,9 @@ class Player(Cell):
                 cc += dc
 
             if not grid.check_bounds(cr, cc):
-                return []
+                return False, []
             if not grid.grid[cr][cc].is_empty():
-                return []
+                return False, []
 
             for r, c in reversed(pushed_cells):
                 grid.grid[r + dr][c + dc] = grid.grid[r][c]
@@ -72,6 +73,6 @@ class Player(Cell):
             game.playerPos = (self.row, self.col)
 
 
-            return list({(r, c) for (r, c) in affected})
+            return True, list({(r, c) for (r, c) in affected})
 
-        return  []
+        return False, []
