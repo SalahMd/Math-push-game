@@ -1,7 +1,9 @@
 import json
+from model.astar import AStarSolver
 from model.dfs import DFS
 from model.bfs import BFS
 from model.game import Game
+from model.heuristic import Heuristic
 from model.json import Json
 if __name__ == "__main__":
 
@@ -17,8 +19,15 @@ if __name__ == "__main__":
     # bfs_solver = BFS(game)
     # solution_bfs = bfs_solver.solve()
     # print("path", solution_bfs)   
+    # 
+    
+    heuristic = Heuristic()
+    solver = AStarSolver(game, heuristic)
+    solution = solver.solve()
+    print("Solution found:", solution)
+   
 
 
-    dfs_solver = DFS(game)
-    solution_dfs = dfs_solver.solve()
-    print("path", solution_dfs)
+    # dfs_solver = DFS(game)
+    # solution_dfs = dfs_solver.solve()
+    # print("path", solution_dfs)

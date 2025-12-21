@@ -1,3 +1,10 @@
-    bfs_solver = BFS(game)
-    solution_bfs = bfs_solver.solve()
-    print("BFS solution:", solution_bfs)
+   # heuristic = Heuristic()
+    # solver = AStarSolver(game, heuristic)
+
+    # solution = solver.solve()
+
+    # if solution:
+    #     print("Solution found:", solution)
+    #     print("Steps:", len(solution))
+    # else:
+    #     print("No solution")
