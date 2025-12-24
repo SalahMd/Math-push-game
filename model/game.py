@@ -133,12 +133,15 @@ class Game:
         states = []
         for move in ["A", "S", "D", "W"]:
             new_game = self.clone1()
-            moved,affected = new_game.player.move_player(move, new_game.grid, new_game)
+            moved, affected = new_game.player.move_player(move, new_game.grid, new_game)
             if not moved:
                 continue
-            if affected is not None :
-                new_game.check_if_equal(affected)
-                states.append((new_game, move))
-                
-        return states  
+            if affected:
+                new_game.last_affected = affected 
+
+            new_game.check_if_equal(affected)
+            states.append((new_game, move))
+
+        return states
+
 

@@ -4,6 +4,7 @@ from model.dfs import DFS
 from model.bfs import BFS
 from model.game import Game
 from model.heuristic import Heuristic
+from model.hill_climbing import HillClimbingSolver
 from model.json import Json
 if __name__ == "__main__":
 
@@ -22,10 +23,13 @@ if __name__ == "__main__":
     # 
     
     heuristic = Heuristic()
-    solver = AStarSolver(game, heuristic)
-    solution = solver.solve()
-    print("Solution found:", solution)
+    # solver = AStarSolver(game, heuristic)
+    # solution = solver.solve()
+    # print("Solution:", solution)
    
+    hill =HillClimbingSolver(game, heuristic)
+    solution = hill.solve()
+    print("Solution:", solution)
 
 
     # dfs_solver = DFS(game)

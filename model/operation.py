@@ -12,3 +12,5 @@ class OperationCell(Cell):
         data = super().serialize()
         data["operation"] = self.operation
         return data
+    def is_operation(self):
+        return True
